@@ -1,0 +1,64 @@
+esphome:
+  name: moisture-humidity
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+
+mqtt:
+  broker: 192.168.2.50
+  birth_message:
+    topic: myavailability/topic
+    payload: online
+  will_message:
+    topic: myavailability/topic
+    payload: offline
+  on_message:
+    - topic: esphome/moisture-humidity/ota_mode
+      payload: 'ON'
+      then:
+        - deep_sleep.prevent: deep_sleep_1
+    - topic: esphome/moisture-humidity/sleep_mode
+      payload: 'ON'
+      then:
+        - deep_sleep.enter: deep_sleep_1
+
+deep_sleep:
+  id: deep_sleep_1
+  run_duration: 10s
+  sleep_duration: 60min
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+#api:
+#  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: !secret WifiSsid
+  password: !secret WifiPassword 
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Moisture-Humidity"
+    password: !secret apWifiPassword 
+
+captive_portal:
+
+
+
+sensor:
+  - platform: dht
+    pin: GPIO02 
+#    accuracy_decimals: 1
+    temperature:
+      name: "Living Room Temperature"
+    humidity:
+      name: "Living Room Humidity"
+    update_interval: 60s    
