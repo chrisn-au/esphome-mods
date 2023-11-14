@@ -27,8 +27,8 @@ mqtt:
 
 deep_sleep:
   id: deep_sleep_1
-  run_duration: 10s
-  sleep_duration: 60min
+  run_duration: 30s
+  sleep_duration: 15min
 
 # Enable logging
 logger:
@@ -43,7 +43,12 @@ ota:
 wifi:
   ssid: !secret WifiSsid
   password: !secret WifiPassword 
+  fast_connect: true
 
+  manual_ip:
+    static_ip: 192.168.2.70
+    gateway: 192.168.2.1
+    subnet: 255.255.255.0
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Moisture-Humidity"
@@ -61,4 +66,4 @@ sensor:
       name: "Living Room Temperature"
     humidity:
       name: "Living Room Humidity"
-    update_interval: 60s    
+    update_interval: 10s    
