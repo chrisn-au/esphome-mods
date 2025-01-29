@@ -1,0 +1,82 @@
+esphome:
+  name: blink
+
+esp32:
+  board: nodemcu-32s
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+mqtt:
+  broker: 192.168.2.50
+  birth_message:
+    topic: myavailability/topic
+    payload: online
+  will_message:
+    topic: myavailability/topic
+    payload: offline
+
+ota:
+  platform : esphome
+
+wifi:
+  ssid: !secret WifiSsid 
+  password: !secret WifiPassword 
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Test Fallback Hotspot"
+    password: !secret apWifiPassword
+
+switch:
+  - platform: gpio
+    name: "LED"
+    pin: GPIO2
+    id: led_switch
+
+# Enable web server
+web_server:
+  port: 80
+
+# Add a simple number control for timing
+number:
+  - platform: template
+    name: "Blink Interval"
+    id: blink_interval
+    optimistic: true
+    min_value: 5
+    max_value: 120
+    initial_value: 30
+    step: 5
+    unit_of_measurement: "seconds"
+
+globals:
+  - id: last_blink_time
+    type: uint32_t
+    initial_value: '0'
+  - id: blink_state
+    type: uint8_t
+    initial_value: '0'
+
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          const uint32_t now = millis();
+          const uint32_t interval = id(blink_interval).state * 1000;
+          
+          if (id(blink_state) == 0 && (now - id(last_blink_time)) >= interval) {
+            id(led_switch).turn_on();
+            id(blink_state) = 1;
+            id(last_blink_time) = now;
+          } 
+          else if (id(blink_state) == 1 && (now - id(last_blink_time)) >= 1000) {
+            id(led_switch).turn_off();
+            id(blink_state) = 0;
+          }

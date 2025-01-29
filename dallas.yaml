@@ -23,6 +23,7 @@ mqtt:
     payload: offline
 
 ota:
+  platform: esphome
   password: ""
 
 wifi:
@@ -39,16 +40,18 @@ web_server:
 
 
 # Example configuration entry
-dallas:
-  - pin: GPIO4
+#dallas:
+one_wire:		
+  - platform: gpio
+    pin: GPIO4
 
 # Individual sensors
 sensor:
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xed3c2ae381316128 
     name: "Pool Temperature"
     accuracy_decimals: 3
-  - platform: dallas
+  - platform: dallas_temp
     address: 0xcb3cdfe38160b528
     name: "Local temperature"
     accuracy_decimals: 3
